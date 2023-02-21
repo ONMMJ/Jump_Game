@@ -80,13 +80,17 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (movement.IsGround && !isSlide)
+            {
                 isJump = true;
+                Sound.instance.PlayJump();
+            }
             movement.Jump();
         }
 
         if (isJump && Input.GetKeyDown(KeyCode.E))
         {
             isSlide = true;
+            Sound.instance.PlayJump();
             movement.Slide(body);
         }
     }

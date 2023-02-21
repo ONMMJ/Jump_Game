@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour
         panel.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        Sound.instance.PlayBgm(2);
     }
     public void OnGameStart()
     {
@@ -72,6 +73,7 @@ public class GameManager : MonoBehaviour
             Player.Instance.LockControl(false);
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            Sound.instance.PlayBgm(1);
         }
         else
             SceneManager.LoadScene(0);
@@ -86,5 +88,6 @@ public class GameManager : MonoBehaviour
         panel.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        Sound.instance.PlayBgm(2);
     }
 }
