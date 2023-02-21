@@ -19,6 +19,7 @@ public class Movement3D : MonoBehaviour
     float slowDebuff = 1;
     bool isGround;                      // 땅에 서 있는가?
 
+    public bool IsRending => isGround && rigid.velocity.y < 0;
     public bool IsGround => isGround;
 
     void Start()
@@ -58,6 +59,13 @@ public class Movement3D : MonoBehaviour
         velocity.y = rigid.velocity.y;
         rigid.velocity = velocity;*/
         rigid.AddForce(transform.forward * slidePower * slowDebuff, ForceMode.Impulse);
+    }
+    public void Slide(Transform body)
+    {
+        /*Vector3 velocity = Vector3.zero;
+        velocity.y = rigid.velocity.y;
+        rigid.velocity = velocity;*/
+        rigid.AddForce(body.forward * slidePower * slowDebuff, ForceMode.Impulse);
     }
 
     private void OnDrawGizmos()

@@ -13,8 +13,6 @@ public class Player : MonoBehaviour
     Movement3D movement;
     Animator anim;
 
-    float inputX;
-    float inputY;
     bool isMove;
     bool isJump;
     bool isSlide;
@@ -29,12 +27,11 @@ public class Player : MonoBehaviour
         rotation = GetComponent<CameraRotation>();
         movement = GetComponent<Movement3D>();
         anim = body.GetComponent<Animator>();
+
+        isLockControl = true;
     }
     private void Update()
-    {/*
-        inputX = 0;
-        inputY = 0;
-*/
+    {
         if (!isLockControl)
         {
             Movement();
@@ -48,69 +45,49 @@ public class Player : MonoBehaviour
         anim.SetBool("isSlide", isSlide);
     }
 
-    private void SmoothMove(float dir, ref float value)
-    {
-        switch (dir)
-        {
-            case 1:
-                value = Mathf.Clamp(value + Time.deltaTime * 5, -1f, 1f);
-                break;
-            case 0:
-                if (value > 0)
-                    value = Mathf.Clamp(value - Time.deltaTime * 5, 0, 1f);
-                else if (value == 0)
-                    value = 0;
-                else
-                    value = Mathf.Clamp(value + Time.deltaTime * 5, -1f, 0);
-                break;
-            case -1:
-                value = Mathf.Clamp(value - Time.deltaTime * 5, -1f, 1f);
-                break;
-            default:
-                break;
-        }
-    }
     private void Movement()
     {
         // 이동.
         float x = Input.GetAxisRaw("Horizontal");
         float y = Input.GetAxisRaw("Vertical");
-        SmoothMove(x, ref inputX);
-        SmoothMove(y, ref inputY);
         isMove = x != 0f || y != 0f;
 
-        // 2D처럼 시점이 고정된 환경이 아니라
-        // 회전이 들어가는 3D에서는
-        // 정면을 '절대좌표'로 잡지 말고 '로컬좌표'로 잡아야한다.
         Vector3 forward = transform.forward * y;        // 내 기준 앞쪽으로.
         Vector3 right = transform.right * x;            // 내 기준 오른쪽으로.
         Vector3 dir = (forward + right).normalized;     // 두 벡터를 더한 후 정규화.
 
-        if(!isSlide)
+        if (!isSlide)
+        {
             movement.Move(dir);
+        }
+        if (isMove)
+        {
+            body.rotation = Quaternion.Slerp(body.rotation, Quaternion.LookRotation(dir), 0.1f);
+        }
 
-        // 점프.
-        if (Input.GetKeyDown(KeyCode.Space))
-            movement.Jump();
-
-
-        if(movement.IsGround)
+        if (movement.IsRending)
         {
             isSlide = false;
             isJump = false;
         }
         else
         {
-            if(!isSlide)
-                isJump = true;
-            else
+            if (isSlide)
                 isJump = false;
+        }
+
+        // 점프.
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (movement.IsGround && !isSlide)
+                isJump = true;
+            movement.Jump();
         }
 
         if (isJump && Input.GetKeyDown(KeyCode.E))
         {
             isSlide = true;
-            movement.Slide();
+            movement.Slide(body);
         }
     }
     private void Rotate()
@@ -126,5 +103,10 @@ public class Player : MonoBehaviour
         // 카메라 줌.
         float zoom = Input.GetAxis("Mouse ScrollWheel");
         rotation.CameraZoom(zoom);
+    }
+
+    public void LockControl(bool isLock)
+    {
+        isLockControl = isLock;
     }
 }

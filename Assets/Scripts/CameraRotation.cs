@@ -38,7 +38,6 @@ public class CameraRotation : MonoBehaviour
         float newDistance;
         if (Physics.Raycast(ray, out hit, distance, layerMask, QueryTriggerInteraction.Ignore))
         {
-            Debug.Log(hit.transform.name);
             newDistance = Vector3.Distance(hit.point, camPivot.position);
             newDistance = Mathf.Clamp(newDistance - 0.5f, 1f, 10f);
         }
